@@ -1,4 +1,4 @@
-# @bahmni-frontend/bahmni-design-system
+# @bahmni/design-system
 
 This library was generated with [Nx](https://nx.dev).
 
