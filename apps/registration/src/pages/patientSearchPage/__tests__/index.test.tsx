@@ -4,11 +4,8 @@ import {
   AuditEventType,
   dispatchAuditEvent,
   getRegistrationConfig,
-} from '@bahmni-frontend/bahmni-services';
-import {
-  NotificationProvider,
-  UserPrivilegeProvider,
-} from '@bahmni-frontend/bahmni-widgets';
+} from '@bahmni/services';
+import { NotificationProvider, UserPrivilegeProvider } from '@bahmni/widgets';
 import {
   QueryClient,
   QueryClientProvider,
@@ -92,9 +89,13 @@ jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn(),
 }));
 
-jest.mock('@bahmni-frontend/bahmni-services', () => ({
-  ...jest.requireActual('@bahmni-frontend/bahmni-services'),
+jest.mock('@bahmni/services', () => ({
+  ...jest.requireActual('@bahmni/services'),
   dispatchAuditEvent: jest.fn(),
+  getCurrentUser: jest.fn().mockResolvedValue({
+    username: 'testuser',
+    uuid: 'test-uuid',
+  }),
   getRegistrationConfig: jest.fn(),
   updateAppointmentStatus: jest.fn(),
   notificationService: {
@@ -146,8 +147,8 @@ const mockUserPrivileges = [
 let mockSearchData: any = null;
 let mockOnSearchArgs: any[];
 
-jest.mock('@bahmni-frontend/bahmni-widgets', () => ({
-  ...jest.requireActual('@bahmni-frontend/bahmni-widgets'),
+jest.mock('@bahmni/widgets', () => ({
+  ...jest.requireActual('@bahmni/widgets'),
   useUserPrivilege: jest.fn(() => ({
     userPrivileges: mockUserPrivileges,
   })),
@@ -274,7 +275,7 @@ describe('PatientSearchPage', () => {
     });
   });
 
-  it('should render the Header with Breadcrumbs component', () => {
+  it('should render the Header with Breadcrumbs and globalActions', () => {
     render(
       <MemoryRouter>
         <NotificationProvider>
@@ -286,10 +287,11 @@ describe('PatientSearchPage', () => {
         </NotificationProvider>
       </MemoryRouter>,
     );
-    expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Search Patient')).toBeInTheDocument();
-    expect(screen.getByText('Create new patient')).toBeInTheDocument();
-    expect(screen.getByText('Hi, Profile name')).toBeInTheDocument();
+    expect(screen.getByTestId('global-action-user')).toBeInTheDocument();
+    const createNewPatientButton = screen.getByRole('button', {
+      name: /create new patient/i,
+    });
+    expect(createNewPatientButton).toBeInTheDocument();
     expect(screen.getByTestId('search-patient-tile')).toBeInTheDocument();
     expect(screen.getByTestId('search-patient-searchbar')).toBeInTheDocument();
     expect(screen.getByTestId('search-patient-searchbar')).toHaveAttribute(

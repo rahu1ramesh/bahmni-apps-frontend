@@ -4,10 +4,16 @@ import type { BasicInfoData } from '../../../../models/patient';
 import { Profile } from '../Profile';
 import type { ProfileRef } from '../Profile';
 
-jest.mock('@bahmni-frontend/bahmni-services', () => ({
+jest.mock('@bahmni/services', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  useCamera: jest.fn(() => ({
+    videoRef: { current: null },
+    start: jest.fn(),
+    stop: jest.fn(),
+    capture: jest.fn(),
+  })),
   MAX_PATIENT_AGE_YEARS: 120,
 }));
 
